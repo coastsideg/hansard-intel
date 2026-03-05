@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["python311", "nodejs_20", "postgresql_15"]
+
+[phases.install]
+cmds = [
+  "cd backend && pip install -r requirements.txt",
+  "cd frontend && npm install",
+  "cd frontend && npm run build",
+  "mkdir -p backend/frontend/dist && cp -r frontend/dist/* backend/frontend/dist/"
+]
+
+[start]
+cmd = "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"

@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --intel-black: #0a0a0f;
+  --intel-dark: #111118;
+  --intel-card: #16161e;
+  --intel-border: #1e1e2e;
+  --intel-gold: #c9a84c;
+  --intel-gold-dim: rgba(201,168,76,0.12);
+  --intel-red: #e63946;
+  --intel-blue: #4a90d9;
+  --intel-green: #2a9d5c;
+  --intel-muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background-color: var(--intel-black);
+  color: #e8e8f0;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--intel-dark); }
+::-webkit-scrollbar-thumb { background: var(--intel-border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--intel-gold); }
+
+/* Gold accent line on active nav items */
+.nav-active {
+  border-left: 2px solid var(--intel-gold);
+  color: var(--intel-gold);
+}
+
+/* Pulse animation for live indicators */
+@keyframes intel-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.intel-pulse { animation: intel-pulse 2s ease-in-out infinite; }
+
+/* Streaming status pill animations */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.status-pill { animation: slide-in 0.3s ease forwards; }
+
+/* Card hover effect */
+.intel-card {
+  background: var(--intel-card);
+  border: 1px solid var(--intel-border);
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+.intel-card:hover {
+  border-color: rgba(201,168,76,0.3);
+  transform: translateY(-1px);
+}
+
+/* Sentiment badges */
+.badge-attack { background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3); }
+.badge-policy { background: rgba(74,144,217,0.15); color: #4a90d9; border: 1px solid rgba(74,144,217,0.3); }
+.badge-grievance { background: rgba(201,168,76,0.15); color: #c9a84c; border: 1px solid rgba(201,168,76,0.3); }
+.badge-procedural { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+.badge-supportive { background: rgba(42,157,92,0.15); color: #2a9d5c; border: 1px solid rgba(42,157,92,0.3); }
+.badge-mixed { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }

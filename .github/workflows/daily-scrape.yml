@@ -1,0 +1,14 @@
+name: Daily Hansard Scrape
+on:
+  schedule:
+    - cron: '0 22 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger daily scrape
+        run: |
+          curl -X POST "${{ secrets.HANSARD_API_URL }}/api/admin/scrape/daily" \
+            -H "Authorization: Bearer ${{ secrets.HANSARD_API_TOKEN }}" -f
