@@ -1,100 +1,59 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../stores/auth'
-import { Hexagon, Lock } from 'lucide-react'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../stores/auth';
+import { Shield, Loader2 } from 'lucide-react';
 
 export default function Login() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const login = useAuthStore((s) => s.login)
-  const navigate = useNavigate()
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, loading, error } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    try {
-      await login(username, password)
-      navigate('/dashboard')
-    } catch {
-      setError('Invalid credentials')
-    } finally {
-      setLoading(false)
+    e.preventDefault();
+    const success = await login(username, password);
+    if (success) {
+      navigate('/');
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--intel-black)' }}>
-      {/* Background grid */}
-      <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: 'linear-gradient(var(--intel-gold) 1px, transparent 1px), linear-gradient(90deg, var(--intel-gold) 1px, transparent 1px)',
-        backgroundSize: '40px 40px',
-      }} />
-
-      <div className="relative z-10 w-full max-w-sm px-6">
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <Hexagon size={28} style={{ color: 'var(--intel-gold)' }} strokeWidth={1} />
-            <span className="font-display text-4xl tracking-widest" style={{ color: 'var(--intel-gold)', letterSpacing: '0.25em' }}>
-              HANSARD
-            </span>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-8">
+          <div className="inline-block bg-blue-600 p-3 rounded-2xl mb-4">
+            <Shield className="text-white" size={32} />
           </div>
-          <div className="font-display text-sm tracking-widest" style={{ color: 'var(--intel-muted)', letterSpacing: '0.5em' }}>
-            INTELLIGENCE PLATFORM
-          </div>
-          <div className="mt-3 text-xs font-mono" style={{ color: 'var(--intel-muted)' }}>
-            WA Labor — Premier's Office
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">HANSARD INTEL</h1>
+          <p className="text-gray-600 mt-2">Opposition Research Facility Access</p>
         </div>
 
-        {/* Form */}
-        <div className="intel-card rounded-lg p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <Lock size={14} style={{ color: 'var(--intel-gold)' }} />
-            <span className="text-xs font-mono tracking-widest" style={{ color: 'var(--intel-muted)' }}>SECURE ACCESS</span>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-xs font-mono mb-1.5" style={{ color: 'var(--intel-muted)' }}>USERNAME</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2.5 rounded text-sm font-body outline-none transition-all"
-                style={{
-                  background: 'var(--intel-black)',
-                  border: '1px solid var(--intel-border)',
-                  color: '#e8e8f0',
-                }}
-                onFocus={(e) => e.target.style.borderColor = 'var(--intel-gold)'}
-                onBlur={(e) => e.target.style.borderColor = 'var(--intel-border)'}
+                className="w-full p-3 border border-gray-300 rounded-lg outline-none transition-all"
                 required
               />
             </div>
+
             <div>
-              <label className="block text-xs font-mono mb-1.5" style={{ color: 'var(--intel-muted)' }}>PASSWORD</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 rounded text-sm font-body outline-none transition-all"
-                style={{
-                  background: 'var(--intel-black)',
-                  border: '1px solid var(--intel-border)',
-                  color: '#e8e8f0',
-                }}
-                onFocus={(e) => e.target.style.borderColor = 'var(--intel-gold)'}
-                onBlur={(e) => e.target.style.borderColor = 'var(--intel-border)'}
+                className="w-full p-3 border border-gray-300 rounded-lg outline-none transition-all"
                 required
               />
             </div>
 
             {error && (
-              <div className="text-xs font-mono py-2 px-3 rounded" style={{ background: 'rgba(230,57,70,0.1)', color: 'var(--intel-red)', border: '1px solid rgba(230,57,70,0.2)' }}>
+              <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
                 {error}
               </div>
             )}
@@ -102,18 +61,13 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded text-sm font-medium tracking-wide transition-all mt-2"
-              style={{
-                background: loading ? 'rgba(201,168,76,0.3)' : 'var(--intel-gold)',
-                color: loading ? 'rgba(0,0,0,0.5)' : '#0a0a0f',
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
+              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition-colors flex items-center justify-center gap-2"
             >
-              {loading ? 'AUTHENTICATING...' : 'ACCESS SYSTEM'}
+              {loading ? <Loader2 className="animate-spin" size={20} /> : 'Authorize Access'}
             </button>
           </form>
         </div>
       </div>
     </div>
-  )
+  );
 }
