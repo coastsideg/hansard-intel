@@ -1,118 +1,78 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { contributionsApi, membersApi } from '../lib/api'
-import ContributionCard from '../components/ContributionCard'
-import { Search, Filter, X } from 'lucide-react'
+import React, { useEffect, useState } from 'react';
+import api from '../lib/api';
+import { BookOpen, Calendar, User, Search, Loader2 } from 'lucide-react';
+
+interface Contribution {
+  id: string;
+  date: string;
+  member_name: string;
+  title: string;
+  content: string;
+}
 
 export default function Contributions() {
-  const [search, setSearch] = useState('')
-  const [sentiment, setSentiment] = useState('')
-  const [party, setParty] = useState('')
-  const [type, setType] = useState('')
-  const [fromDate, setFromDate] = useState('')
-  const [toDate, setToDate] = useState('')
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const params = {
-    search: search || undefined,
-    sentiment: sentiment || undefined,
-    party: party || undefined,
-    contribution_type: type || undefined,
-    from_date: fromDate || undefined,
-    to_date: toDate || undefined,
-    limit: 50,
-  }
+  useEffect(() => {
+    const fetchContributions = async () => {
+      try {
+        const { data } = await api.get('/contributions');
+        setContributions(data);
+      } catch (err) {
+        console.error('Failed to fetch contributions');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContributions();
+  }, []);
 
-  const { data: contributions, isLoading } = useQuery({
-    queryKey: ['contributions', params],
-    queryFn: () => contributionsApi.list(params).then((r) => r.data),
-  })
+  const filtered = contributions.filter(c => 
+    c.member_name.toLowerCase().includes(search.toLowerCase()) ||
+    c.title.toLowerCase().includes(search.toLowerCase()) ||
+    c.content.toLowerCase().includes(search.toLowerCase())
+  ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const hasFilters = search || sentiment || party || type || fromDate || toDate
-  const clearFilters = () => {
-    setSearch(''); setSentiment(''); setParty(''); setType(''); setFromDate(''); setToDate('')
-  }
+  if (loading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-blue-600" size={32} /></div>;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display text-3xl tracking-widest" style={{ color: 'var(--intel-gold)', letterSpacing: '0.2em' }}>
-            CONTRIBUTIONS
-          </h1>
-          <div className="text-xs font-mono mt-1" style={{ color: 'var(--intel-muted)' }}>
-            Search & filter all opposition Hansard contributions
-          </div>
-        </div>
-        {contributions && (
-          <span className="text-xs font-mono" style={{ color: 'var(--intel-muted)' }}>
-            {contributions.length} RESULTS
-          </span>
-        )}
-      </div>
-
-      {/* Search & filters */}
-      <div className="intel-card rounded-lg p-4 mb-5 space-y-3">
+    <div className="max-w-5xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Hansard Records</h1>
         <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--intel-muted)' }} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search contributions, summaries, topics..."
+            placeholder="Search all records by keyword, member, or topic..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded text-sm outline-none"
-            style={{ background: 'var(--intel-black)', border: '1px solid var(--intel-border)', color: '#e8e8f0' }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--intel-gold)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--intel-border)'}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
           />
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-          {[
-            { label: 'Sentiment', value: sentiment, setter: setSentiment, options: ['attack', 'policy', 'grievance', 'procedural', 'supportive', 'mixed'] },
-            { label: 'Party', value: party, setter: setParty, options: ['Liberal', 'National', 'Greens', 'One Nation', 'Independent'] },
-          ].map(({ label, value, setter, options }) => (
-            <select
-              key={label}
-              value={value}
-              onChange={(e) => setter(e.target.value)}
-              className="px-3 py-2 rounded text-xs font-mono outline-none"
-              style={{ background: 'var(--intel-black)', border: '1px solid var(--intel-border)', color: value ? '#e8e8f0' : 'var(--intel-muted)' }}
-            >
-              <option value="">{label}</option>
-              {options.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
-          ))}
-
-          <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
-            className="px-3 py-2 rounded text-xs font-mono outline-none"
-            style={{ background: 'var(--intel-black)', border: '1px solid var(--intel-border)', color: fromDate ? '#e8e8f0' : 'var(--intel-muted)', colorScheme: 'dark' }} />
-
-          <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)}
-            className="px-3 py-2 rounded text-xs font-mono outline-none"
-            style={{ background: 'var(--intel-black)', border: '1px solid var(--intel-border)', color: toDate ? '#e8e8f0' : 'var(--intel-muted)', colorScheme: 'dark' }} />
-
-          {hasFilters && (
-            <button onClick={clearFilters} className="flex items-center gap-1.5 px-3 py-2 rounded text-xs font-mono transition-all"
-              style={{ background: 'rgba(230,57,70,0.1)', color: 'var(--intel-red)', border: '1px solid rgba(230,57,70,0.2)' }}>
-              <X size={12} /> Clear
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Results */}
-      {isLoading ? (
-        <div className="text-center py-12 text-sm" style={{ color: 'var(--intel-muted)' }}>Searching...</div>
-      ) : (
-        <div className="space-y-3">
-          {contributions?.map((c: any) => <ContributionCard key={c.id} contribution={c} />)}
-          {!contributions?.length && (
-            <div className="intel-card rounded-lg p-8 text-center text-sm" style={{ color: 'var(--intel-muted)' }}>
-              No contributions match your filters.
+      <div className="space-y-4">
+        {filtered.map((item) => (
+          <div key={item.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex flex-wrap gap-4 mb-3 text-sm font-semibold uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 text-blue-600">
+                <Calendar size={14} />
+                {new Date(item.date).toLocaleDateString('en-AU')}
+              </div>
+              <div className="flex items-center gap-1.5 text-gray-600">
+                <User size={14} />
+                {item.member_name}
+              </div>
             </div>
-          )}
-        </div>
-      )}
+            <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+            <p className="text-gray-700 text-sm leading-relaxed line-clamp-2 italic">
+              "{item.content}"
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
-  )
+  );
 }
