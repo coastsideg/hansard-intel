@@ -6,7 +6,7 @@ import Intelligence from './pages/Intelligence';
 import Members from './pages/Members';
 import MemberDetail from './pages/MemberDetail';
 import Contributions from './pages/Contributions';
-import Admin from './pages/Admin'; // Ensure this matches your filename
+import Admin from './pages/Admin';
 import { useAuthStore } from './stores/auth';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -20,7 +20,6 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-          <index element={<Dashboard />} />
           <Route index element={<Dashboard />} />
           <Route path="intelligence" element={<Intelligence />} />
           <Route path="members" element={<Members />} />
