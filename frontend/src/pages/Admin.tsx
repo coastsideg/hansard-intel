@@ -1,3 +1,6 @@
+Admin final · TSX
+Copy
+
 import React, { useEffect, useState } from 'react';
 import api from '../lib/api';
 import {
@@ -82,7 +85,7 @@ export default function Admin() {
       setActionMessage({ type: 'error', text: 'Enter a valid year between 2017 and 2025.' });
       return;
     }
-    if (!window.confirm(`Start historical scrape from ${year} to present?\n\nRuns in the background on Railway. Poll status panel to track progress.`)) return;
+    if (!window.confirm(`Start historical scrape from ${year} to present?`)) return;
 
     setActionLoading(true);
     setActionMessage(null);
@@ -108,10 +111,14 @@ export default function Admin() {
     }
   };
 
-  const maxYearCount = stats?.records_by_year ? Math.max(...Object.values(stats.records_by_year), 1) : 1;
-  const aiProgressPct = stats?.contributions.total && stats.contributions.total > 0
-    ? Math.round((stats.contributions.ai_processed / stats.contributions.total) * 100)
-    : 0;
+  const maxYearCount = stats?.records_by_year
+    ? Math.max(...Object.values(stats.records_by_year), 1)
+    : 1;
+
+  const aiProgressPct =
+    stats?.contributions.total && stats.contributions.total > 0
+      ? Math.round((stats.contributions.ai_processed / stats.contributions.total) * 100)
+      : 0;
 
   if (loading) {
     return (
@@ -127,7 +134,9 @@ export default function Admin() {
         <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
           <XCircle size={20} />
           <span className="font-medium">{fetchError}</span>
-          <button onClick={fetchStats} className="ml-auto text-sm underline hover:no-underline">Retry</button>
+          <button onClick={fetchStats} className="ml-auto text-sm underline hover:no-underline">
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -136,7 +145,6 @@ export default function Admin() {
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
 
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <Database className="text-blue-600" size={26} />
@@ -148,29 +156,29 @@ export default function Admin() {
               <RefreshCw className="animate-spin" size={16} /> SCRAPE IN PROGRESS
             </div>
           )}
-          <button onClick={fetchStats} className="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Refresh now">
+          <button onClick={fetchStats} className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
             <RefreshCw size={20} />
           </button>
         </div>
       </div>
 
-      {/* Action feedback */}
       {actionMessage && (
         <div className={`flex items-start gap-3 rounded-xl px-4 py-3 border text-sm font-medium ${actionMessage.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
-          {actionMessage.type === 'success' ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" /> : <AlertCircle size={16} className="mt-0.5 shrink-0" />}
+          {actionMessage.type === 'success'
+            ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+            : <AlertCircle size={16} className="mt-0.5 shrink-0" />}
           {actionMessage.text}
         </div>
       )}
 
-      {/* Top row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        {/* Scraper Control */}
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Download size={20} className="text-blue-600" /> Historical Ingestion
           </h2>
-          <p className="text-sm text-gray-500">Enter start year to automatically download and index all Hansard PDFs from that year to present. Runs in the background on Railway.</p>
+          <p className="text-sm text-gray-500">
+            Enter start year to automatically download and index all Hansard PDFs from that year to present.
+          </p>
           <div className="flex gap-3">
             <input
               type="number"
@@ -191,7 +199,6 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* DB Integrity */}
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <BarChart3 size={20} className="text-blue-600" /> Database Integrity
@@ -209,7 +216,6 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Pipeline stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Sources Total', value: stats?.sources.total ?? 0, icon: <FileText size={16} className="text-gray-400" />, color: 'text-gray-900' },
@@ -227,7 +233,6 @@ export default function Admin() {
         ))}
       </div>
 
-      {/* AI Progress */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -243,7 +248,6 @@ export default function Admin() {
         <p className="text-xs text-gray-400">{aiProgressPct}% AI-analysed</p>
       </div>
 
-      {/* Year Breakdown */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
           <span className="font-bold text-sm text-gray-700 uppercase tracking-wider">Data Coverage by Year</span>
