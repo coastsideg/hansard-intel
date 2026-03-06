@@ -13,10 +13,19 @@ export const useIntelligenceStore = create<IntelligenceState>((set) => ({
   askQuestion: async (question) => {
     set({ loading: true, response: null })
     try {
-      const { data } = await api.post('/intelligence/ask', { question })
-      set({ response: data.answer, loading: false })
-    } catch {
-      set({ response: 'Error retrieving response.', loading: false })
+      const { data } = await api.post('/chat/', { 
+        query: question 
+      })
+      // Handles both potential backend response keys
+      set({ 
+        response: data.response || data.answer || 'No data returned.', 
+        loading: false 
+      })
+    } catch (error) {
+      set({ 
+        response: 'Error: Connection to research backend failed.', 
+        loading: false 
+      })
     }
   }
 }))
