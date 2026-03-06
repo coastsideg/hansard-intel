@@ -13,19 +13,21 @@ export const useIntelligenceStore = create<IntelligenceState>((set) => ({
   askQuestion: async (question) => {
     set({ loading: true, response: null })
     try {
-      const { data } = await api.post('/chat/', { 
-        query: question 
-      })
-      // Handles both potential backend response keys
-      set({ 
-        response: data.response || data.answer || 'No data returned.', 
-        loading: false 
-      })
+      const { data } = await api.post('/chat/', { query: question })
+      
+      // If backend returns a JSON string inside a 'response' field, parse it
+      let content = data.response || data.answer || 'No data found.'
+      
+      try {
+        const parsed = JSON.parse(content)
+        content = parsed.response || content
+      } catch (e) {
+        // Not JSON, use as is
+      }
+
+      set({ response: content, loading: false })
     } catch (error) {
-      set({ 
-        response: 'Error: Connection to research backend failed.', 
-        loading: false 
-      })
+      set({ response: 'Error: Connection failed.', loading: false })
     }
   }
 }))
