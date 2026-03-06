@@ -15,16 +15,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public route */}
         <Route path="/login" element={<Login />} />
-
-        {/*
-          Protected shell — Layout contains <Outlet />.
-          ALL pages that need the nav/sidebar live as children here.
-          This is why /admin was blank: it must be a child of this route,
-          not a sibling. The <Outlet /> in Layout renders whichever child
-          route is currently active.
-        */}
         <Route
           path="/"
           element={
@@ -36,8 +27,6 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="intelligence" element={<Intelligence />} />
           <Route path="admin" element={<Admin />} />
-
-          {/* Catch-all: redirect unknown paths to dashboard */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
