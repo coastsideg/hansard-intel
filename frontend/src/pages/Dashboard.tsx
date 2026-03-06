@@ -1,6 +1,5 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, BookOpen, Clock } from 'lucide-react';
+import { Search, Clock } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
