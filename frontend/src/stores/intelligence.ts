@@ -4,30 +4,32 @@ import api from '../lib/api'
 interface IntelligenceState {
   loading: boolean
   response: string | null
-  askQuestion: (question: string) => Promise<void>
+  askQuestion: (question: string, member?: string, issue?: string) => Promise<void>
 }
 
 export const useIntelligenceStore = create<IntelligenceState>((set) => ({
   loading: false,
   response: null,
-  askQuestion: async (question) => {
+  askQuestion: async (question, member, issue) => {
     set({ loading: true, response: null })
     try {
-      const { data } = await api.post('/chat/', { query: question })
+      // INSTRUCTION: Tells the RAG system to ignore temporal bias and search the full index
+      const globalQuery = `SEARCH ALL HISTORICAL RECORDS: Identify all relevant Hansard contributions for ${member || 'any member'} regarding ${issue || 'any issue'}. Include results from all years in the database. Query: ${question}`
+
+      const { data } = await api.post('/chat/', { 
+        query: globalQuery 
+      })
       
-      // If backend returns a JSON string inside a 'response' field, parse it
       let content = data.response || data.answer || 'No data found.'
       
       try {
         const parsed = JSON.parse(content)
         content = parsed.response || content
-      } catch (e) {
-        // Not JSON, use as is
-      }
+      } catch (e) {}
 
       set({ response: content, loading: false })
     } catch (error) {
-      set({ response: 'Error: Connection failed.', loading: false })
+      set({ response: 'Error: Connection to research backend failed.', loading: false })
     }
   }
 }))
