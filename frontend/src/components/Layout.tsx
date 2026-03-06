@@ -14,13 +14,12 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Minimal Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-2">
           <div className="bg-blue-600 p-1.5 rounded-lg">
             <Shield className="text-white" size={20} />
           </div>
-          <span className="font-bold text-gray-900 tracking-tight">HANSARD INTEL</span>
+          <span className="font-bold text-gray-900 tracking-tight text-lg">HANSARD INTEL</span>
         </div>
         
         <div className="flex items-center gap-4">
@@ -35,9 +34,8 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="py-8">
+      <main className="flex-1">
+        <div className="h-full">
           <Outlet />
         </div>
       </main>
