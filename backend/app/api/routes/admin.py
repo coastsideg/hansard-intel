@@ -236,4 +236,3 @@ async def system_status(
             "ai_processed": ai_done_result.scalar() or 0,
         },
     }
-
