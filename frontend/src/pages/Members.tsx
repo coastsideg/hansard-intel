@@ -1,107 +1,90 @@
-import { useQuery } from '@tanstack/react-query'
-import { membersApi } from '../lib/api'
-import { useNavigate } from 'react-router-dom'
-import { Users, ChevronRight } from 'lucide-react'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../lib/api';
+import { User, Search, Loader2 } from 'lucide-react';
 
-const PARTY_COLORS: Record<string, string> = {
-  'Liberal': '#003087',
-  'National': '#006633',
-  'Greens': '#009B3A',
-  'One Nation': '#FF6600',
-  'Independent': '#888888',
+interface Member {
+  id: string;
+  name: string;
+  party: string;
+  electorate: string;
 }
 
 export default function Members() {
-  const navigate = useNavigate()
-  const { data: members, isLoading } = useQuery({
-    queryKey: ['members'],
-    queryFn: () => membersApi.list().then((r) => r.data),
-  })
+  const [members, setMembers] = useState<Member[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const byParty = members?.reduce((acc: any, m: any) => {
-    if (!acc[m.party]) acc[m.party] = []
-    acc[m.party].push(m)
-    return acc
-  }, {}) ?? {}
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const { data } = await api.get('/members');
+        setMembers(data);
+      } catch (err) {
+        console.error('Failed to fetch members');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMembers();
+  }, []);
+
+  const filteredMembers = members.filter(m => 
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
+    m.electorate.toLowerCase().includes(search.toLowerCase())
+  ).sort((a, b) => a.name.localeCompare(b.name));
+
+  if (loading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-blue-600" size={32} /></div>;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display text-3xl tracking-widest" style={{ color: 'var(--intel-gold)', letterSpacing: '0.2em' }}>
-            MEMBERS
-          </h1>
-          <div className="text-xs font-mono mt-1" style={{ color: 'var(--intel-muted)' }}>
-            Opposition & crossbench · Both chambers
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Users size={14} style={{ color: 'var(--intel-muted)' }} />
-          <span className="text-xs font-mono" style={{ color: 'var(--intel-muted)' }}>
-            {members?.length ?? 0} TRACKED
-          </span>
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Member Directory</h1>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search by name or electorate..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          />
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-12 text-sm" style={{ color: 'var(--intel-muted)' }}>Loading members...</div>
-      ) : (
-        <div className="space-y-6">
-          {Object.entries(byParty).map(([party, partyMembers]: [string, any]) => (
-            <div key={party}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 rounded-full" style={{ background: PARTY_COLORS[party] || '#888' }} />
-                <h2 className="text-xs font-mono tracking-widest" style={{ color: 'var(--intel-muted)' }}>
-                  {party.toUpperCase()} · {partyMembers.length} MEMBERS
-                </h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {partyMembers.map((m: any) => (
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase">Member</th>
+              <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase">Electorate</th>
+              <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {filteredMembers.map((member) => (
+              <tr key={member.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-gray-100 p-2 rounded-full"><User size={16} className="text-gray-600" /></div>
+                    <span className="font-medium text-gray-900">{member.name}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-gray-600 text-sm">{member.electorate}</td>
+                <td className="px-6 py-4 text-right">
                   <button
-                    key={m.id}
-                    onClick={() => navigate(`/members/${m.id}`)}
-                    className="intel-card rounded-lg p-4 text-left w-full group"
+                    onClick={() => navigate(`/members/${member.id}`)}
+                    className="text-blue-600 hover:underline text-sm font-medium"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-9 h-9 rounded flex items-center justify-center text-sm font-display font-bold flex-shrink-0"
-                          style={{ background: `${PARTY_COLORS[party] || '#888'}22`, color: PARTY_COLORS[party] || '#888', border: `1px solid ${PARTY_COLORS[party] || '#888'}44` }}
-                        >
-                          {m.avatar_initials || m.full_name.slice(0, 2)}
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">{m.full_name}</div>
-                          <div className="text-xs mt-0.5" style={{ color: 'var(--intel-muted)' }}>
-                            {m.electorate} · {m.chamber === 'Legislative Assembly' ? 'Assembly' : 'Council'}
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity mt-1" style={{ color: 'var(--intel-gold)' }} />
-                    </div>
-                    <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--intel-border)' }}>
-                      <span className="text-xs font-mono" style={{ color: 'var(--intel-muted)' }}>
-                        {m.total_contributions?.toLocaleString()} contributions
-                      </span>
-                      {m.role && (
-                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--intel-gold-dim)', color: 'var(--intel-gold)' }}>
-                          {m.role.replace('Shadow ', '').slice(0, 20)}
-                        </span>
-                      )}
-                    </div>
+                    View History
                   </button>
-                ))}
-              </div>
-            </div>
-          ))}
-          {!Object.keys(byParty).length && (
-            <div className="intel-card rounded-lg p-8 text-center">
-              <p className="text-sm mb-2" style={{ color: 'var(--intel-muted)' }}>No members found.</p>
-              <p className="text-xs" style={{ color: 'var(--intel-border)' }}>Go to Admin → Seed Members to populate known opposition members.</p>
-            </div>
-          )}
-        </div>
-      )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-  )
+  );
 }
