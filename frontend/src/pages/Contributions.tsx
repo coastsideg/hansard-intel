@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../lib/api';
-import { BookOpen, Calendar, User, Search, Loader2 } from 'lucide-react';
+import { Calendar, User, Search, Loader2 } from 'lucide-react';
 
 interface Contribution {
   id: string;
@@ -45,18 +45,18 @@ export default function Contributions() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
-            placeholder="Search all records by keyword, member, or topic..."
+            placeholder="Search records..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg outline-none"
           />
         </div>
       </div>
 
       <div className="space-y-4">
         {filtered.map((item) => (
-          <div key={item.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex flex-wrap gap-4 mb-3 text-sm font-semibold uppercase tracking-wider">
+          <div key={item.id} className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="flex gap-4 mb-3 text-sm font-semibold uppercase tracking-wider">
               <div className="flex items-center gap-1.5 text-blue-600">
                 <Calendar size={14} />
                 {new Date(item.date).toLocaleDateString('en-AU')}
@@ -67,9 +67,7 @@ export default function Contributions() {
               </div>
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-            <p className="text-gray-700 text-sm leading-relaxed line-clamp-2 italic">
-              "{item.content}"
-            </p>
+            <p className="text-gray-700 italic">"{item.content}"</p>
           </div>
         ))}
       </div>
