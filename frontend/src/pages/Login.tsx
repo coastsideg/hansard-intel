@@ -11,8 +11,8 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(username, password);
-    if (success) {
+    const isSuccess = await login(username, password);
+    if (isSuccess) {
       navigate('/');
     }
   };
@@ -25,43 +25,30 @@ export default function Login() {
             <Shield className="text-white" size={32} />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">HANSARD INTEL</h1>
-          <p className="text-gray-600 mt-2">Opposition Research Facility Access</p>
         </div>
-
         <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg outline-none transition-all"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg outline-none transition-all"
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
-                {error}
-              </div>
-            )}
-
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg"
+              required
+            />
+            {error && <div className="text-red-600 text-sm">{error}</div>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg flex justify-center items-center"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : 'Authorize Access'}
             </button>
