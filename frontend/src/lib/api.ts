@@ -34,30 +34,20 @@ export const authApi = {
 
 export const membersApi = {
   list: (params?: object) => api.get('/members/', { params }),
-  stats: (id: string) => api.get(`/members/${id}/stats`),
+  get: (id: string) => api.get(`/members/${id}`),
 }
 
 export const contributionsApi = {
   list: (params?: object) => api.get('/contributions/', { params }),
-  overview: () => api.get('/contributions/stats/overview'),
-  recentAttacks: (days?: number) => api.get('/contributions/recent-attacks', { params: { days } }),
 }
 
 export const chatApi = {
-  send: (query: string, sessionId?: string) =>
-    api.post('/chat/', { query, session_id: sessionId }),
-  sessions: () => api.get('/chat/sessions'),
-  messages: (sessionId: string) => api.get(`/chat/sessions/${sessionId}/messages`),
-}
-
-export const digestApi = {
-  latest: () => api.get('/digest/latest'),
-  generate: (date?: string) => api.post('/digest/generate', null, { params: { target_date: date } }),
+  ask: (question: string) => 
+    api.post('/intelligence/ask', { question, stream: false }),
 }
 
 export const adminApi = {
   status: () => api.get('/admin/status'),
-  historicalScrape: (fromYear: number) => api.post('/admin/scrape/historical', { from_year: fromYear }),
-  dailyScrape: () => api.post('/admin/scrape/daily'),
-  seedMembers: () => api.post('/admin/seed-members'),
+  processFailed: () => api.post('/admin/process-failed'),
+  harvest: () => api.post('/admin/harvest'),
 }
