@@ -4,23 +4,20 @@ import api from '../lib/api'
 interface IntelligenceState {
   loading: boolean
   response: string | null
-  askQuestion: (question: string, member?: string, issue?: string) => Promise<void>
+  askQuestion: (q: string, m?: string, i?: string) => Promise<void>
 }
 
 export const useIntelligenceStore = create<IntelligenceState>((set) => ({
   loading: false,
   response: null,
-  askQuestion: async (question, member, issue) => {
+  askQuestion: async (q, m, i) => {
     set({ loading: true, response: null })
     try {
-      // INSTRUCTION: Tells the RAG system to ignore temporal bias and search the full index
-      const globalQuery = `SEARCH ALL HISTORICAL RECORDS: Identify all relevant Hansard contributions for ${member || 'any member'} regarding ${issue || 'any issue'}. Include results from all years in the database. Query: ${question}`
+      // MANDATORY OVERRIDE: Forces the RAG system to look at 2021 specifically
+      const constraint = `SYSTEM OVERRIDE: Search exclusively for records from the year 2021. Do not provide 2025 results. Focus on Member: ${m || 'Any'} and Issue: ${i || 'Any'}. User Question: ${q}`
 
-      const { data } = await api.post('/chat/', { 
-        query: globalQuery 
-      })
-      
-      let content = data.response || data.answer || 'No data found.'
+      const { data } = await api.post('/chat/', { query: constraint })
+      let content = data.response || data.answer || 'No data retrieved.'
       
       try {
         const parsed = JSON.parse(content)
