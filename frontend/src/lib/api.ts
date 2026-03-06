@@ -5,14 +5,12 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Inject JWT token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('hansard_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
-// Redirect to login on 401
 api.interceptors.response.use(
   (r) => r,
   (err) => {
@@ -26,7 +24,6 @@ api.interceptors.response.use(
 
 export default api
 
-// API functions
 export const authApi = {
   login: (username: string, password: string) =>
     api.post('/auth/login', { username, password }),
@@ -39,11 +36,6 @@ export const membersApi = {
 
 export const contributionsApi = {
   list: (params?: object) => api.get('/contributions/', { params }),
-}
-
-export const chatApi = {
-  ask: (question: string) => 
-    api.post('/intelligence/ask', { question, stream: false }),
 }
 
 export const adminApi = {
