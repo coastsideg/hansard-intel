@@ -1,6 +1,3 @@
-Admin final · TSX
-Copy
-
 import React, { useEffect, useState } from 'react';
 import api from '../lib/api';
 import {
