@@ -16,7 +16,6 @@ export default function Intelligence() {
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">HANSARD INTEL AI</h1>
-        <p className="text-gray-600">Direct search of Western Australian Parliamentary records since 2017.</p>
       </div>
 
       <form onSubmit={handleSearch} className="mb-8">
@@ -25,13 +24,13 @@ export default function Intelligence() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask a question (e.g., 'When did the Premier mention Metronet in February 2026?')"
-            className="w-full p-4 pr-12 text-lg border-2 border-blue-500 rounded-xl focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+            placeholder="Ask a question..."
+            className="w-full p-4 pr-12 text-lg border-2 border-blue-500 rounded-xl outline-none"
           />
           <button
             type="submit"
             disabled={loading}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg disabled:bg-blue-300"
           >
             {loading ? <Loader2 className="animate-spin" /> : <Search size={24} />}
           </button>
@@ -44,7 +43,7 @@ export default function Intelligence() {
             <MessageSquare size={20} className="text-blue-600" />
             <span className="font-semibold text-gray-700">AI Response</span>
           </div>
-          <div className="p-6 prose max-w-none text-gray-800 leading-relaxed">
+          <div className="p-6 text-gray-800 leading-relaxed">
             {response}
           </div>
         </div>
