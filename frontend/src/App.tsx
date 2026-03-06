@@ -19,7 +19,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to="/intelligence" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="members" element={<Members />} />
         <Route path="members/:id" element={<MemberDetail />} />
