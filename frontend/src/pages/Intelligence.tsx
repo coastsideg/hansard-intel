@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useIntelligenceStore } from '../stores/intelligence';
-import { Search, MessageSquare, Loader2, FileText } from 'lucide-react';
+import { Search, FileText, Loader2 } from 'lucide-react';
 
 export default function Intelligence() {
   const [query, setQuery] = useState('');
@@ -12,42 +12,44 @@ export default function Intelligence() {
     await askQuestion(query);
   };
 
+  // Clean the AI response of JSON markers
+  const cleanResponse = (text: string | null) => {
+    if (!text) return null;
+    return text
+      .replace(/```json\n?/, '')
+      .replace(/```/, '')
+      .replace(/\\n/g, '\n')
+      .replace(/{[\s\S]*"response":\s*"/, '') // Remove JSON header
+      .replace(/"\s*,\s*"confidence"[\s\S]*}/, ''); // Remove JSON footer
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">HANSARD INTEL AI</h1>
-        <p className="text-sm text-gray-500 uppercase tracking-widest">Clinical Research Mode</p>
-      </div>
-
+      <h1 className="text-2xl font-bold mb-6 text-center">HANSARD INTEL AI</h1>
+      
       <form onSubmit={handleSearch} className="mb-8">
         <div className="relative">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter research query..."
-            className="w-full p-4 pr-12 text-lg border-2 border-blue-600 rounded-xl outline-none shadow-sm"
+            placeholder="Search Hansard Records..."
+            className="w-full p-4 border-2 border-blue-600 rounded-xl outline-none"
           />
-          <button
-            type="submit"
-            disabled={loading}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg"
-          >
-            {loading ? <Loader2 className="animate-spin" /> : <Search size={24} />}
+          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg">
+            {loading ? <Loader2 className="animate-spin" /> : <Search />}
           </button>
         </div>
       </form>
 
       {response && (
-        <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="p-4 bg-gray-900 text-white flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <FileText size={18} />
-              <span className="font-bold text-sm uppercase">Intelligence Report</span>
-            </div>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+          <div className="p-4 bg-gray-900 text-white rounded-t-xl flex items-center gap-2">
+            <FileText size={18} />
+            <span className="font-bold text-xs uppercase tracking-widest">Intelligence Report</span>
           </div>
-          <div className="p-8 text-gray-900 whitespace-pre-wrap font-sans leading-relaxed">
-            {response.replace(/\\n/g, '\n').replace(/#{1,6}\s?/g, '')}
+          <div className="p-8 text-gray-900 whitespace-pre-wrap leading-relaxed">
+            {cleanResponse(response)}
           </div>
         </div>
       )}
